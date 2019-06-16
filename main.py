@@ -6,17 +6,18 @@ import nvector as nv
 from tqdm import tqdm
 
 
-def get_geocoords_from_input(input_file):
+def get_geocoords_from_input(input_file, step):
     with rasterio.open(input_file) as src:
-        #plot.show(src)
+        plot.show(src)
         elevation_values = src.read(1)
         lat_long_elev_data = []
         # Range is limited due to long execution time. for y in range(src.height):
-        for y in range(0, src.height, 100): 
+        for y in range(0, src.height, step): 
             # Range is limited due to long execution time. for x in range(src.width):
-            for x in range(0, src.width, 100): 
+            for x in range(0, src.width, step): 
                 longitude, latitude = src.xy(x,y)
                 elevation = elevation_values[x,y]
+                elevation = elevation if elevation > -100 else 0 # Cleaning sea data
                 lat_long_elev_data.append((
                     x, y, latitude, longitude, elevation
                 ))
@@ -33,30 +34,22 @@ def geocoords_to_vectors(lat_long_elev_data):
         p_EB_E = pointB.to_ecef_vector()
         x, y, z = p_EB_E.pvector.ravel()[0], p_EB_E.pvector.ravel()[1], p_EB_E.pvector.ravel()[2]
         vectors.append((
-            width, height, latitude, longitude, x, y, z
+            width, height, x, y, z
         ))
     return vectors
 
 
-def mark_tops_of_the_world(vectors):
-    tops_of_the_world = []
+def get_tops_of_the_world(vectors):
     pbar = tqdm(total=len(vectors))
-    for examined_point in vectors:
+
+    tops_of_the_world = []
+    for point in vectors:
         center = np.array([0,0,0])
-        line_vector = np.array([examined_point[4], examined_point[5], examined_point[6]])
+        line_vector = np.array([point[2], point[3], point[4]])
 
-        points_on_line = []
-        for point in vectors:
-            point_on_line = closest_point_on_line(
-                center, line_vector, np.array([point[4], point[5], point[6]])
-            )
-            x, y, z = point_on_line[0], point_on_line[1], point_on_line[2]
-            points_on_line.append((
-                point[0], point[1], x, y, z 
-            ))
-
-        top = max(points_on_line, key=distance)
+        top = get_top_for_vector(center, line_vector, vectors)
         tops_of_the_world.append((top[0], top[1]))
+
         pbar.update(1)
 
     unique_tops = []
@@ -68,7 +61,22 @@ def mark_tops_of_the_world(vectors):
     return unique_tops
 
 
-def closest_point_on_line(a, b, p):
+def get_top_for_vector(a, b, vectors):
+    points_on_line = []
+    for point in vectors:
+        point_on_line = closest_point_on_line(
+            a, b, np.array([point[2], point[3], point[4]])
+        )
+        x, y, z = point_on_line[0], point_on_line[1], point_on_line[2]
+        points_on_line.append((
+            point[0], point[1], x, y, z 
+        ))
+
+    top = max(points_on_line, key=distance)
+    return top
+
+
+def closest_point_on_line(a, b, p): # TODO: Check how it really works
     ap = p-a
     ab = b-a
     result = a + np.dot(ap,ab)/np.dot(ab,ab) * ab
@@ -79,41 +87,48 @@ def distance(point):
     return np.sqrt(point[2]**2 + point[3]**2 + point[4]**2)
 
 
-def save_file(input_file, tops_of_the_world):
+def save_file(input_file, tops_of_the_world, step):
     with rasterio.open(input_file) as src:
         profile = src.profile
         data = src.read()
+        width = src.width
+        height = src.height
 
     for x, y in tops_of_the_world:
-        for i in range(100):
-            if y+i < 6000:
-                for j in range(100):
-                    if x+j < 6000:
-                        data[0][y+i][x+j] = 32000
-
-    plot.show(data)
+        for i in range(step):
+            if y+i < height:
+                for j in range(step):
+                    if x+j < width:
+                        data[0][x+j][y+i] = 32000
 
     with rasterio.open('output.tif', 'w', **profile) as dst:
-        dst.write(data[0].astype(rasterio.int16), 1)
+        dst.write(data[0].astype(rasterio.int16), 1) 
+        """
+        TODO: Find the bug! It seems to mark the points that are NOT 
+        actually the tops of the world. Like depressions and seas.
+        Higher points like mountains are not marked!
+        """
+
+    plot.show(data)
 
 
 def main():
     input_file = 'srtm_40_02.tif'
+    step = 100 # TODO: Add counting step function to be relative to the image size
 
     print("Reading lat long elevation data from the {} file...".format(input_file))
-    lat_long_elev_data = get_geocoords_from_input(input_file)
+    lat_long_elev_data = get_geocoords_from_input(input_file, step)
 
     print("Converting lat long elevation data to xyz vectors...")
     vectors = geocoords_to_vectors(lat_long_elev_data)
 
     print("Marking tops of the world...")
-    tops_of_the_world = mark_tops_of_the_world(vectors)
-
-    print("Tops of the world (x, y):")
-    print(tops_of_the_world)
+    tops_of_the_world = get_tops_of_the_world(vectors)
 
     print("Saving output file...")
-    save_file(input_file, tops_of_the_world)
+    save_file(input_file, tops_of_the_world, step)
+
+    print("Tops of the world saved successfully!")
     
    
 if __name__ == "__main__":
