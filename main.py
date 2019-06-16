@@ -7,8 +7,8 @@ from tqdm import tqdm
 
 
 def main():
-    input_file = 'srtm_40_02.tif'
-    step = 100 # TODO: Add counting step function to be relative to the image size
+    input_file = 'alwdgg.tif'
+    step = 30 # TODO: Add counting step function to be relative to the image size
 
     print("Reading lat long elevation data from the {} file...".format(input_file))
     lat_long_elev_data = get_geocoords_from_input(input_file, step)
@@ -36,7 +36,7 @@ def get_geocoords_from_input(input_file, step):
             for x in range(0, src.width, step): 
                 longitude, latitude = src.xy(y,x)
                 elevation = elevation_values[y,x]
-                elevation = elevation if elevation > -100 else 0 # Cleaning sea data
+                # elevation = elevation if elevation > -100 else 0 # Cleaning sea data
                 lat_long_elev_data.append((
                     x, y, latitude, longitude, elevation
                 ))
