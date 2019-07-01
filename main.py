@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 
 def main():
-    input_file = 'data/15-D.tif'
+    input_file = 'data/srtm_40_02.tif' # TODO: Do not hardcode it. Use a script parameter
     step = 130 # TODO: Add counting step function to be relative to the image size
 
     print("Reading lat long elevation data from the {} file...".format(input_file))
@@ -81,7 +81,14 @@ def get_tops_of_the_world(vectors):
     return unique_tops
 
 
-def get_top_for_vector(a, b, vectors):
+def get_top_for_vector(a, b, vectors): 
+    """ TODO: Keep in mind that if the whole world is checked
+    it could be higher point (bigger distance to the center)
+    on the opposite side of the Earth. Only close vectors should 
+    be included in the comparison. Another way to fix the bug is 
+    to find the smallest distance to the point for example 2x
+    farther than the b point (not the farthest from the center)
+    """
     points_on_line = []
     for point in vectors:
         point_on_line = closest_point_on_line(
@@ -96,7 +103,7 @@ def get_top_for_vector(a, b, vectors):
     return top
 
 
-def closest_point_on_line(a, b, p): # TODO: Check how it really works
+def closest_point_on_line(a, b, p): # TODO: Comment it well
     ap = p-a
     ab = b-a
     result = a + np.dot(ap,ab)/np.dot(ab,ab) * ab
@@ -123,11 +130,6 @@ def save_file(input_file, tops_of_the_world, step):
 
     with rasterio.open('output.tif', 'w', **profile) as dst:
         dst.write(data[0].astype(rasterio.int16), 1) 
-        """
-        TODO: Find the bug! It seems to mark the points that are NOT 
-        actually the tops of the world. Like depressions and seas.
-        Higher points like mountains are not marked!
-        """
 
     plot.show(data)
 
