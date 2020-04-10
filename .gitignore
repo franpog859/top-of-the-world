@@ -2,6 +2,4 @@
 .env/
 .ipynb_checkpoints/
 __pycache__/
-data/15-D.tif
-data/output.tif
-output.tif
+*.tif

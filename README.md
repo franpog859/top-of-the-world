@@ -5,8 +5,8 @@ I just wanted to proof that your country is the top of the world. Do you know th
 <p align="center">
 <table cellspacing="0" cellpadding="0">
   <tr>
-    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/doc/mount-everest-1.png"></th>
-    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/doc/chimborazo-1.png"></th>
+    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/assets/mount-everest-1.png"></th>
+    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/assets/chimborazo-1.png"></th>
   </tr>
 </table>
 </p>
@@ -20,8 +20,8 @@ Okay! But how that will make your country the top? See, there are already at lea
 <p align="center">
 <table cellspacing="0" cellpadding="0">
   <tr>
-    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/doc/my-1.png"></th>
-    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/doc/my-2.png"></th>
+    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/assets/my-1.png"></th>
+    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/assets/my-2.png"></th>
   </tr>
 </table>
 </p>
@@ -35,8 +35,8 @@ Points on the map marked with yellow square could be interpreted as the tops of 
 <p align="center">
 <table cellspacing="0" cellpadding="0">
   <tr>
-    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/doc/world1.png"></th>
-    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/doc/world2.png"></th>
+    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/assets/world1.png"></th>
+    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/assets/world2.png"></th>
   </tr>
 </table>
 </p>
@@ -46,8 +46,8 @@ My computer cannot handle higher resolution (it already took about an hour to co
 <p align="center">
 <table cellspacing="0" cellpadding="0">
   <tr>
-    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/doc/europe1.png"></th>
-    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/doc/europe2.png"></th>
+    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/assets/europe1.png"></th>
+    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/assets/europe2.png"></th>
   </tr>
 </table>
 </p>
@@ -57,8 +57,8 @@ On the Europe map we can see some mountains and their shadows. If there is some 
 <p align="center">
 <table cellspacing="0" cellpadding="0">
   <tr>
-    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/doc/poland1.png"></th>
-    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/doc/poland2.png"></th>
+    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/assets/poland1.png"></th>
+    <th scope="col"><img src="https://raw.githubusercontent.com/franpog859/top-of-the-world/master/assets/poland2.png"></th>
   </tr>
 </table>
 </p>
