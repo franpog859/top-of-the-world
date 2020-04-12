@@ -8,6 +8,7 @@ update_database.py
 plot_figures.py
     -d --database 
     -l --local default="local_tops.json"
+calculate_tops_in_colab.ipynb
 calculate_tops.py 
     -d --dummy (do not save results to the local file)
     -f --file REQUIRED
