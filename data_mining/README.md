@@ -1,3 +1,5 @@
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/franpog859/top-of-the-world/blob/master/data_mining/calculate_tops_in_colab.ipynb)
+
 ```
 backup_to_local.py
     -l --local default="local_tops.json"

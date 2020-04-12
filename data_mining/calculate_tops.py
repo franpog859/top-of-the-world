@@ -50,16 +50,6 @@ def parse_arguments() -> tuple(str, int, str, bool, bool, bool):
     return args.file, args.step, args.output, args.dummy, args.margin, args.plot
 
 
-def plotGlobe(xyz_list: list(XYZ)):
-    x = [xyz.x for xyz in xyz_list]
-    y = [xyz.y for xyz in xyz_list]
-    z = [xyz.z for xyz in xyz_list]
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, z)
-    plt.show()
-
-
 class LatLongElev:
     def __init__(self, latitude: float, longitude: float, elevation: float=0.0):
         self.latitude = latitude
@@ -91,6 +81,17 @@ class XYZ:
 
     def to_np_array(self) -> np.array:
         return np.array([self.x, self.y, self.z])
+
+
+def plotGlobe(xyz_list: list(XYZ)):
+    x = [xyz.x for xyz in xyz_list]
+    y = [xyz.y for xyz in xyz_list]
+    z = [xyz.z for xyz in xyz_list]
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z)
+    plt.show()
+
 
 
 DEEPEST_DEPRESSION_ON_EARTH = -418.0
