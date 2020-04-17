@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
 import nvector as nv
+from typing import List, Tuple
 
 
 def main():
@@ -38,7 +39,7 @@ def main():
     print("Finished successfully!")
 
 
-def parse_arguments() -> tuple(str, int, str, bool, bool, bool):
+def parse_arguments() -> Tuple[str, int, str, bool, bool, bool]:
     parser = ArgumentParser()
     parser.add_argument("-f", "--file", required=True, help="use a map from *.tif file")
     parser.add_argument("-s", "--step", type=int, default=1, help="don't use all pixels - go with a step")
@@ -83,7 +84,7 @@ class XYZ:
         return np.array([self.x, self.y, self.z])
 
 
-def plotGlobe(xyz_list: list(XYZ)):
+def plotGlobe(xyz_list: List(XYZ)):
     x = [xyz.x for xyz in xyz_list]
     y = [xyz.y for xyz in xyz_list]
     z = [xyz.z for xyz in xyz_list]
@@ -95,7 +96,7 @@ def plotGlobe(xyz_list: list(XYZ)):
 
 
 DEEPEST_DEPRESSION_ON_EARTH = -418.0
-def get_latlongelev_list_from_tif_image(image_file: str, step: int=1) -> list(LatLongElev):
+def get_latlongelev_list_from_tif_image(image_file: str, step: int=1) -> List(LatLongElev):
     latlongelev_list = []
     with rasterio.open(image_file) as image:
         elevation_values = image.read(1)
@@ -109,7 +110,7 @@ def get_latlongelev_list_from_tif_image(image_file: str, step: int=1) -> list(La
     return latlongelev_list
 
 
-def latlongelev_list_to_xyz_list(latlongelev_list: list(LatLongElev)) -> list(XYZ):
+def latlongelev_list_to_xyz_list(latlongelev_list: List(LatLongElev)) -> List(XYZ):
     # See https://github.com/pbrod/nvector#example-4-geodetic-latitude-to-ecef-vector
     wgs84 = nv.FrameE(name='WGS84')
     xyz_list = []
@@ -122,7 +123,7 @@ def latlongelev_list_to_xyz_list(latlongelev_list: list(LatLongElev)) -> list(XY
     return xyz_list
 
 
-def filter_only_tops(xyz_list: list(XYZ)) -> list(XYZ):
+def filter_only_tops(xyz_list: List(XYZ)) -> List(XYZ):
     progress_bar = tqdm(total=len(xyz_list))
     top_list = []
     for xyz in xyz_list:
@@ -136,7 +137,7 @@ def filter_only_tops(xyz_list: list(XYZ)) -> list(XYZ):
 
 
 CENTER_OF_THE_EARTH = XYZ(0, 0, 0)
-def get_top_for_direction(direction: XYZ, xyz_list: list(XYZ)) -> XYZ:
+def get_top_for_direction(direction: XYZ, xyz_list: List(XYZ)) -> XYZ:
     xyz_projection_list = []
     for xyz in xyz_list:
         xyz_projection = xyz.project_onto_line(CENTER_OF_THE_EARTH, direction)
