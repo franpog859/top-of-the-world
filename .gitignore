@@ -4,3 +4,4 @@
 __pycache__/
 *.tif
 .DS_Store
+.pytest_cache/
