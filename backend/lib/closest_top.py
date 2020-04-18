@@ -30,10 +30,8 @@ def get_tops_for_index(xyz: XYZ, collection: pymongo.collection.Collection) -> L
     tops = [XYZ(top['x'], top['y'], top['z']) for top in cursor['tops']]
     return tops
 def calculate_closest_top(xyz: XYZ, tops: List[XYZ]) -> XYZ:
-    closest_top = min(tops, key=lambda item:
-        # The square root function is monotonic, so it can be discarded
-        ((xyz.x-item.x)**2 + (xyz.y-item.y)**2 + (xyz.z-item.z)**2))
+    # The square root function is monotonic, so it can be discarded
+    closest_top = min(tops, key=lambda item: ((xyz.x-item.x)**2 + (xyz.y-item.y)**2 + (xyz.z-item.z)**2))
     return closest_top
 def convert_xyz_to_latlong(xyz: XYZ) -> Tuple[float, float]:
     return 123.42, -32.123
-
