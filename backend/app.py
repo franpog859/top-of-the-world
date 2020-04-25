@@ -3,9 +3,11 @@ import pymongo
 import os
 from lib.closest_top import find_closest_top
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 
 app = Flask(__name__)
+cors = CORS(app)
 
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
@@ -29,26 +31,28 @@ def healthz():
     if request.headers.get(AUTH_TOKEN_HEADER_KEY) != AUTH_TOKEN:
         app.logger.warning('failed to authenticate')
         return jsonify(error='failed to authenticate'), 403
+
+    app.logger.info('checking database connection...')
     try:
         with pymongo.MongoClient(CONNECTION_FORMAT.format(USERNAME, PASSWORD)) as client:
             collection = client[DATABASE_NAME][COLLECTION_NAME]
             collection.find_one({}, {'_id': 0, 'index': 0, 'tops': 0})
-            app.logger.info('database connection succeeded')
     except Exception as e:
         app.logger.error('failed to connect to the database: {}'.format(str(e)))
         return jsonify(error='failed to connect to the database'), 500
+
     app.logger.info('server is healthy')
     return jsonify(status='healthy'), 200
 
 
 @app.route('/closestTop/<float(signed=True):latitude>/<float(signed=True):longitude>', methods=['GET'])
 def closest_top(latitude: float, longitude: float):
-    app.logger.info('GET /closestTop')
+    app.logger.info('GET /closestTop/<float(signed=True):latitude>/<float(signed=True):longitude>')
     if request.headers.get(AUTH_TOKEN_HEADER_KEY) != AUTH_TOKEN:
         app.logger.warning('failed to authenticate')
         return jsonify(error='failed to authenticate'), 403
 
-    app.logger.info('finding the closest top for lat={}, long={}'.format(latitude, longitude))
+    app.logger.info('finding the closest top for lat={}, long={}...'.format(latitude, longitude))
     try:
         with pymongo.MongoClient(CONNECTION_FORMAT.format(USERNAME, PASSWORD)) as client:
             collection = client[DATABASE_NAME][COLLECTION_NAME]
