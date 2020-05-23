@@ -34,4 +34,4 @@ def calculate_closest_top(xyz: XYZ, tops: List[XYZ]) -> XYZ:
     closest_top = min(tops, key=lambda item: ((xyz.x-item.x)**2 + (xyz.y-item.y)**2 + (xyz.z-item.z)**2))
     return closest_top
 def convert_xyz_to_latlong(xyz: XYZ) -> Tuple[float, float]:
-    return 123.42, -32.123
+    return 28.5983, 83.9311

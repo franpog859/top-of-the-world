@@ -1,11 +1,12 @@
 from __future__ import annotations
 from argparse import ArgumentParser
 from tqdm import tqdm
+from typing import List, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
 import nvector as nv
-from typing import List, Tuple
+import json
 
 
 def main():
@@ -18,23 +19,21 @@ def main():
     points = latlongelev_list_to_xyz_list(latlongelev_list)
     if should_plot:
         print("Plotting map...")
-        plotGlobe(points)
+        plot_globe(points)
 
     print("Marking tops of the world...")
     tops = filter_only_tops(points)
-    # TODO:
-    # if not should_mark_on_margin:
-    #     print("Filtering tops on the map's margin...")
-    #     tops = filter_out_of_margin(tops)
+    if not should_mark_on_margin:
+        print("Filtering tops on the map's margin...")
+        tops = filter_out_of_margin(tops)
 
     if should_plot:
         print("Plotting tops of the world...")
-        plotGlobe(tops)
+        plot_globe(tops)
 
-    # TODO:
-    # if not should_omit_saving:
-    #     print("Saving tops to the {} file...".format(output_file))
-    #     save_results_to_local_file(tops, output_file)
+    if not should_omit_saving:
+        print("Saving tops to the {} file...".format(output_file))
+        save_results_to_local_file(tops, output_file)
 
     print("Finished successfully!")
 
@@ -70,6 +69,9 @@ class XYZ:
     def __str__(self) -> str:
         return "x={}, y={}, z={}".format(self.x, self.y, self.z)
 
+    def __hash__(self) -> int:
+        return hash((self.x, self.y, self.z))
+
     def project_onto_line(self, _a: XYZ, _b: XYZ) -> XYZ:
         # See https://gamedev.stackexchange.com/questions/72528/how-can-i-project-a-3d-point-onto-a-3d-line
         p = self.to_np_array()
@@ -80,19 +82,14 @@ class XYZ:
         result = a + np.dot(ap, ab)/np.dot(ab, ab) * ab
         return XYZ(result[0], result[1], result[2])
 
+    def get_chunk_index(self, chunk_size: float) -> XYZ:
+        x = self.x - self.x % chunk_size
+        y = self.y - self.y % chunk_size
+        z = self.z - self.z % chunk_size
+        return XYZ(x, y, z)
+
     def to_np_array(self) -> np.array:
         return np.array([self.x, self.y, self.z])
-
-
-def plotGlobe(xyz_list: List[XYZ]):
-    x = [xyz.x for xyz in xyz_list]
-    y = [xyz.y for xyz in xyz_list]
-    z = [xyz.z for xyz in xyz_list]
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, z)
-    plt.show()
-
 
 
 DEEPEST_DEPRESSION_ON_EARTH = -418.0
@@ -121,6 +118,16 @@ def latlongelev_list_to_xyz_list(latlongelev_list: List[LatLongElev]) -> List[XY
         x, y, z = p_EB_E.pvector.ravel()[0], p_EB_E.pvector.ravel()[1], p_EB_E.pvector.ravel()[2]
         xyz_list.append(XYZ(x, y, z))
     return xyz_list
+
+
+def plot_globe(xyz_list: List[XYZ]):
+    x = [xyz.x for xyz in xyz_list]
+    y = [xyz.y for xyz in xyz_list]
+    z = [xyz.z for xyz in xyz_list]
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z)
+    plt.show()
 
 
 def filter_only_tops(xyz_list: List[XYZ]) -> List[XYZ]:
@@ -159,6 +166,36 @@ def are_on_the_same_side_relative_to_center(a: XYZ, b: XYZ) -> bool:
 def _distance(xyz: XYZ) -> float:
     # The square root function is monotonic, so it can be discarded
     return xyz.x**2 + xyz.y**2 + xyz.z**2
+
+
+def filter_out_of_margin(tops: List[XYZ]) -> List[XYZ]:
+    # TODO:
+    print("TODO: filter_out_of_margin")
+    return tops
+
+
+CHUNK_SIZE = 100000
+def save_results_to_local_file(tops: List[XYZ], output_file: str):
+    tops_dto = convert_tops_to_dto(tops, CHUNK_SIZE)
+    with open(output_file, 'w') as file:
+        json.dump(tops_dto, file)
+
+
+def convert_tops_to_dto(tops: List[XYZ], chunk_size: int) -> List:
+    chunks = {}
+    for top in tops:
+        index = top.get_chunk_index(chunk_size)
+        chunk = chunks.get(index)
+        if chunk:
+            chunks[index]["tops"].append(top)
+        else:
+            chunks[index] = {"index": index, "tops": [top]}
+
+    dto = [{
+        "index": vars(chunk["index"]),
+        "tops": [vars(top) for top in chunk["tops"]]
+        } for _, chunk in chunks.items()]
+    return dto
 
 
 if __name__ == "__main__":

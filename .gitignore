@@ -3,5 +3,6 @@
 .ipynb_checkpoints/
 __pycache__/
 *.tif
+data_mining/*.json
 .DS_Store
 .pytest_cache/

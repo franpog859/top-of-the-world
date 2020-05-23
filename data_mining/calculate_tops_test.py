@@ -75,3 +75,52 @@ def test_are_on_the_same_side_relative_to_center():
         result = are_on_the_same_side_relative_to_center(a, b)
         # then
         assert result == expected_result
+
+
+def test_convert_tops_to_dto():
+    # given
+    chunk_size = 1000
+    test_top_list = [
+        XYZ(1001, 2001, 4000),
+        XYZ(1006, 2001, 4999),
+        XYZ(-1001, -2999, -4000),
+    ]
+    expected_dto = [
+        {
+            "index": {
+                "x": 1000,
+                "y": 2000,
+                "z": 4000,
+            },
+            "tops": [
+                {
+                   "x": 1001,
+                   "y": 2001,
+                   "z": 4000,
+                },
+                {
+                   "x": 1006,
+                   "y": 2001,
+                   "z": 4999,
+                }
+            ]
+        },
+        {
+            "index": {
+                "x": -2000,
+                "y": -3000,
+                "z": -4000,
+            },
+            "tops": [
+                {
+                   "x": -1001,
+                   "y": -2999,
+                   "z": -4000,
+                }
+            ]
+        },
+    ]
+    # when
+    dto = convert_tops_to_dto(test_top_list, chunk_size)
+    # then
+    assert dto == expected_dto
