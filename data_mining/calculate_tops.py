@@ -1,7 +1,7 @@
 from __future__ import annotations
 from argparse import ArgumentParser
 from tqdm import tqdm
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
@@ -12,40 +12,40 @@ import json
 def main():
     input_file, step, output_file, should_omit_saving, should_mark_on_margin, should_plot = parse_arguments()
 
-    print("Reading lat long elevation data from the {} file...".format(input_file))
+    print('Reading lat long elevation data from the {} file...'.format(input_file))
     latlongelev_list = get_latlongelev_list_from_tif_image(input_file, step)
 
-    print("Converting lat long elevation data to xyz points...")
+    print('Converting lat long elevation data to xyz points...')
     points = latlongelev_list_to_xyz_list(latlongelev_list)
     if should_plot:
-        print("Plotting map...")
+        print('Plotting map...')
         plot_globe(points)
 
-    print("Marking tops of the world...")
+    print('Marking tops of the world...')
     tops = filter_only_tops(points)
     if not should_mark_on_margin:
-        print("Filtering tops on the map's margin...")
+        print('Filtering tops on the map\'s margin...')
         tops = filter_out_of_margin(tops)
 
     if should_plot:
-        print("Plotting tops of the world...")
+        print('Plotting tops of the world...')
         plot_globe(tops)
 
     if not should_omit_saving:
-        print("Saving tops to the {} file...".format(output_file))
+        print('Saving tops to the {} file...'.format(output_file))
         save_results_to_local_file(tops, output_file)
 
-    print("Finished successfully!")
+    print('Finished successfully!')
 
 
 def parse_arguments() -> Tuple[str, int, str, bool, bool, bool]:
     parser = ArgumentParser()
-    parser.add_argument("-f", "--file", required=True, help="use a map from *.tif file")
-    parser.add_argument("-s", "--step", type=int, default=1, help="don't use all pixels - go with a step")
-    parser.add_argument("-o", "--output", default="local_tops.json", help="save result to specific file")
-    parser.add_argument("-d", "--dummy", action="store_true", help="do not save results to the local file")
-    parser.add_argument("-m", "--margin", action="store_true", help="mark tops also on the map's margin")
-    parser.add_argument("-p", "--plot", action="store_true", help="plot the map and the map with the tops")
+    parser.add_argument('-f', '--file', required=True, help='use a map from *.tif file')
+    parser.add_argument('-s', '--step', type=int, default=1, help='don\'t use all pixels - go with a step')
+    parser.add_argument('-o', '--output', default='local_tops.json', help='save result to specific file')
+    parser.add_argument('-d', '--dummy', action='store_true', help='do not save results to the local file')
+    parser.add_argument('-m', '--margin', action='store_true', help='mark tops also on the map\'s margin')
+    parser.add_argument('-p', '--plot', action='store_true', help='plot the map and the map with the tops')
     args = parser.parse_args()
     return args.file, args.step, args.output, args.dummy, args.margin, args.plot
 
@@ -67,7 +67,7 @@ class XYZ:
         return self.x == xyz.x and self.y == xyz.y and self.z == xyz.z
 
     def __str__(self) -> str:
-        return "x={}, y={}, z={}".format(self.x, self.y, self.z)
+        return 'x={}, y={}, z={}'.format(self.x, self.y, self.z)
 
     def __hash__(self) -> int:
         return hash((self.x, self.y, self.z))
@@ -170,33 +170,33 @@ def _distance(xyz: XYZ) -> float:
 
 def filter_out_of_margin(tops: List[XYZ]) -> List[XYZ]:
     # TODO:
-    print("TODO: filter_out_of_margin")
+    print('TODO: filter_out_of_margin')
     return tops
 
 
-CHUNK_SIZE = 100000
+CHUNK_SIZE = 1000000 # 1000x1000x1000 km cube
 def save_results_to_local_file(tops: List[XYZ], output_file: str):
     tops_dto = convert_tops_to_dto(tops, CHUNK_SIZE)
     with open(output_file, 'w') as file:
         json.dump(tops_dto, file)
 
 
-def convert_tops_to_dto(tops: List[XYZ], chunk_size: int) -> List:
+def convert_tops_to_dto(tops: List[XYZ], chunk_size: int) -> List[Dict]:
     chunks = {}
     for top in tops:
         index = top.get_chunk_index(chunk_size)
         chunk = chunks.get(index)
         if chunk:
-            chunks[index]["tops"].append(top)
+            chunks[index]['tops'].append(top)
         else:
-            chunks[index] = {"index": index, "tops": [top]}
+            chunks[index] = {'index': index, 'tops': [top]}
 
     dto = [{
-        "index": vars(chunk["index"]),
-        "tops": [vars(top) for top in chunk["tops"]]
+        'index': vars(chunk['index']),
+        'tops': [vars(top) for top in chunk['tops']]
         } for _, chunk in chunks.items()]
     return dto
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
