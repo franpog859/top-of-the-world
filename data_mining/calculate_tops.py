@@ -1,52 +1,51 @@
 from __future__ import annotations
 from argparse import ArgumentParser
 from tqdm import tqdm
+from typing import List, Tuple, Dict
 import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
 import nvector as nv
-from typing import List, Tuple
+import json
 
 
 def main():
     input_file, step, output_file, should_omit_saving, should_mark_on_margin, should_plot = parse_arguments()
 
-    print("Reading lat long elevation data from the {} file...".format(input_file))
+    print('Reading lat long elevation data from the {} file...'.format(input_file))
     latlongelev_list = get_latlongelev_list_from_tif_image(input_file, step)
 
-    print("Converting lat long elevation data to xyz points...")
+    print('Converting lat long elevation data to xyz points...')
     points = latlongelev_list_to_xyz_list(latlongelev_list)
     if should_plot:
-        print("Plotting map...")
-        plotGlobe(points)
+        print('Plotting map...')
+        plot_globe(points)
 
-    print("Marking tops of the world...")
+    print('Marking tops of the world...')
     tops = filter_only_tops(points)
-    # TODO:
-    # if not should_mark_on_margin:
-    #     print("Filtering tops on the map's margin...")
-    #     tops = filter_out_of_margin(tops)
+    if not should_mark_on_margin:
+        print('Filtering tops on the map\'s margin...')
+        tops = filter_out_of_margin(tops)
 
     if should_plot:
-        print("Plotting tops of the world...")
-        plotGlobe(tops)
+        print('Plotting tops of the world...')
+        plot_globe(tops)
 
-    # TODO:
-    # if not should_omit_saving:
-    #     print("Saving tops to the {} file...".format(output_file))
-    #     save_results_to_local_file(tops, output_file)
+    if not should_omit_saving:
+        print('Saving tops to the {} file...'.format(output_file))
+        save_results_to_local_file(tops, output_file)
 
-    print("Finished successfully!")
+    print('Finished successfully!')
 
 
 def parse_arguments() -> Tuple[str, int, str, bool, bool, bool]:
     parser = ArgumentParser()
-    parser.add_argument("-f", "--file", required=True, help="use a map from *.tif file")
-    parser.add_argument("-s", "--step", type=int, default=1, help="don't use all pixels - go with a step")
-    parser.add_argument("-o", "--output", default="local_tops.json", help="save result to specific file")
-    parser.add_argument("-d", "--dummy", action="store_true", help="do not save results to the local file")
-    parser.add_argument("-m", "--margin", action="store_true", help="mark tops also on the map's margin")
-    parser.add_argument("-p", "--plot", action="store_true", help="plot the map and the map with the tops")
+    parser.add_argument('-f', '--file', required=True, help='use a map from *.tif file')
+    parser.add_argument('-s', '--step', type=int, default=1, help='don\'t use all pixels - go with a step')
+    parser.add_argument('-o', '--output', default='local_tops.json', help='save result to specific file')
+    parser.add_argument('-d', '--dummy', action='store_true', help='do not save results to the local file')
+    parser.add_argument('-m', '--margin', action='store_true', help='mark tops also on the map\'s margin')
+    parser.add_argument('-p', '--plot', action='store_true', help='plot the map and the map with the tops')
     args = parser.parse_args()
     return args.file, args.step, args.output, args.dummy, args.margin, args.plot
 
@@ -68,7 +67,10 @@ class XYZ:
         return self.x == xyz.x and self.y == xyz.y and self.z == xyz.z
 
     def __str__(self) -> str:
-        return "x={}, y={}, z={}".format(self.x, self.y, self.z)
+        return 'x={}, y={}, z={}'.format(self.x, self.y, self.z)
+
+    def __hash__(self) -> int:
+        return hash((self.x, self.y, self.z))
 
     def project_onto_line(self, _a: XYZ, _b: XYZ) -> XYZ:
         # See https://gamedev.stackexchange.com/questions/72528/how-can-i-project-a-3d-point-onto-a-3d-line
@@ -80,19 +82,14 @@ class XYZ:
         result = a + np.dot(ap, ab)/np.dot(ab, ab) * ab
         return XYZ(result[0], result[1], result[2])
 
+    def get_chunk_index(self, chunk_size: float) -> XYZ:
+        x = self.x - self.x % chunk_size
+        y = self.y - self.y % chunk_size
+        z = self.z - self.z % chunk_size
+        return XYZ(x, y, z)
+
     def to_np_array(self) -> np.array:
         return np.array([self.x, self.y, self.z])
-
-
-def plotGlobe(xyz_list: List[XYZ]):
-    x = [xyz.x for xyz in xyz_list]
-    y = [xyz.y for xyz in xyz_list]
-    z = [xyz.z for xyz in xyz_list]
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, z)
-    plt.show()
-
 
 
 DEEPEST_DEPRESSION_ON_EARTH = -418.0
@@ -121,6 +118,16 @@ def latlongelev_list_to_xyz_list(latlongelev_list: List[LatLongElev]) -> List[XY
         x, y, z = p_EB_E.pvector.ravel()[0], p_EB_E.pvector.ravel()[1], p_EB_E.pvector.ravel()[2]
         xyz_list.append(XYZ(x, y, z))
     return xyz_list
+
+
+def plot_globe(xyz_list: List[XYZ]):
+    x = [xyz.x for xyz in xyz_list]
+    y = [xyz.y for xyz in xyz_list]
+    z = [xyz.z for xyz in xyz_list]
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z)
+    plt.show()
 
 
 def filter_only_tops(xyz_list: List[XYZ]) -> List[XYZ]:
@@ -161,5 +168,35 @@ def _distance(xyz: XYZ) -> float:
     return xyz.x**2 + xyz.y**2 + xyz.z**2
 
 
-if __name__ == "__main__":
+def filter_out_of_margin(tops: List[XYZ]) -> List[XYZ]:
+    # TODO:
+    print('TODO: filter_out_of_margin')
+    return tops
+
+
+CHUNK_SIZE = 1000000 # 1000x1000x1000 km cube
+def save_results_to_local_file(tops: List[XYZ], output_file: str):
+    tops_dto = convert_tops_to_dto(tops, CHUNK_SIZE)
+    with open(output_file, 'w') as file:
+        json.dump(tops_dto, file)
+
+
+def convert_tops_to_dto(tops: List[XYZ], chunk_size: int) -> List[Dict]:
+    chunks = {}
+    for top in tops:
+        index = top.get_chunk_index(chunk_size)
+        chunk = chunks.get(index)
+        if chunk:
+            chunks[index]['tops'].append(top)
+        else:
+            chunks[index] = {'index': index, 'tops': [top]}
+
+    dto = [{
+        'index': vars(chunk['index']),
+        'tops': [vars(top) for top in chunk['tops']]
+        } for _, chunk in chunks.items()]
+    return dto
+
+
+if __name__ == '__main__':
     main()

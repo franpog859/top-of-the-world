@@ -16,15 +16,12 @@ function App() {
   const setAsyncPosition = async () => {
     navigator.geolocation.getCurrentPosition(
       position => setCurrentPosition(position),
-      err => console.log('Failed to get current position', err)
+      error => console.error('Failed to get current position: ', error)
     )
   }
-  const buildHealthzBackendPath = () => {
-    return `${backendURL}/healthz`
-  }
+  const buildHealthzBackendPath = () => `${backendURL}/healthz`
   const warmUpBackend = async () => {
-    console.log('warming backend up')
-    console.debug(buildHealthzBackendPath())
+    console.log('Warming the backend up...')
     fetch(buildHealthzBackendPath(), {headers: {'token': authToken}})
       .then(response => response.json())
       .then(response => console.debug(response))
@@ -39,8 +36,7 @@ function App() {
     return `${backendURL}/closestTop/${position.coords.latitude}/${position.coords.longitude}`
   }
   const fetchClosestTopPosition = async () => {
-    console.log('fetching closest top position')
-    console.debug(buildClosestTopBackendPath(currentPosition!))
+    console.log('Fetching closest top position...')
     fetch(buildClosestTopBackendPath(currentPosition!), {headers: {'token': authToken}})
       .then(response => response.json())
       .then(response => {console.debug(response); return response})
@@ -66,7 +62,7 @@ function App() {
     window.open('https://github.com/franpog859/top-of-the-world/blob/master/README.md')
   }
 
-  const enableMapButton = (): boolean => {
+  const shouldMapButtonBeEnabled = (): boolean => {
     return currentPosition !== undefined && topPosition !== undefined
   }
 
@@ -77,7 +73,7 @@ function App() {
           variant='success'
           onClick={openMap}
           size='lg'
-          disabled={!enableMapButton()}>
+          disabled={!shouldMapButtonBeEnabled()}>
             Take me to the top!
         </Button>
         <br></br>
