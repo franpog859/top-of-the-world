@@ -190,11 +190,11 @@ def convert_tops_to_dto(tops: List[XYZ], chunk_size: int) -> List[Dict]:
         else:
             chunks[index] = {'index': index, 'tops': [top]}
 
-    dto = [{
+    data_transfer_object = [{
         'index': vars(chunk['index']),
         'tops': [vars(top) for top in chunk['tops']]
         } for _, chunk in chunks.items()]
-    return dto
+    return data_transfer_object
 
 
 if __name__ == '__main__':
