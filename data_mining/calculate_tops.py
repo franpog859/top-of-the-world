@@ -185,8 +185,7 @@ def convert_tops_to_dto(tops: List[XYZ], chunk_size: int) -> List[Dict]:
     chunks = {}
     for top in tops:
         index = top.get_chunk_index(chunk_size)
-        chunk = chunks.get(index)
-        if chunk:
+        if chunks.get(index):
             chunks[index]['tops'].append(top)
         else:
             chunks[index] = {'index': index, 'tops': [top]}
