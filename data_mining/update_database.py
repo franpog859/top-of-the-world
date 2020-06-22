@@ -38,7 +38,17 @@ COLLECTION_NAME = os.environ['COLLECTION_NAME']
 def update_database_with_dto(dto):
     with pymongo.MongoClient(CONNECTION_FORMAT.format(USERNAME, PASSWORD)) as client:
         collection = client[DATABASE_NAME][COLLECTION_NAME]
-        collection.find_one({}, {'_id': 0, 'index': 0, 'tops': 0})
+
+        for chunk in dto:
+            index = chunk['index']
+            tops = chunk['tops']
+            cursor = collection.find_one({'index': index}, {'_id': 0, 'index': 0})
+            if cursor:
+                tops.extend(cursor['tops'])
+                # See https://stackoverflow.com/questions/11092511/python-list-of-unique-dictionaries
+                tops = list({(top['x'], top['y'], top['z']):top for top in tops}.values())
+
+            collection.update_one({'index': index}, {'$set': {'tops': tops}}, upsert=True)
 
 
 if __name__ == '__main__':
