@@ -174,7 +174,7 @@ def filter_out_of_margin(tops: List[XYZ]) -> List[XYZ]:
     return tops
 
 
-CHUNK_SIZE = 1000000 # 1000x1000x1000 km cube
+CHUNK_SIZE = 200000 # 200x200x200 km cube
 def save_results_to_local_file(tops: List[XYZ], output_file: str):
     tops_dto = convert_tops_to_dto(tops, CHUNK_SIZE)
     with open(output_file, 'w') as file:
@@ -185,17 +185,16 @@ def convert_tops_to_dto(tops: List[XYZ], chunk_size: int) -> List[Dict]:
     chunks = {}
     for top in tops:
         index = top.get_chunk_index(chunk_size)
-        chunk = chunks.get(index)
-        if chunk:
+        if chunks.get(index):
             chunks[index]['tops'].append(top)
         else:
             chunks[index] = {'index': index, 'tops': [top]}
 
-    dto = [{
+    data_transfer_object = [{
         'index': vars(chunk['index']),
         'tops': [vars(top) for top in chunk['tops']]
         } for _, chunk in chunks.items()]
-    return dto
+    return data_transfer_object
 
 
 if __name__ == '__main__':
