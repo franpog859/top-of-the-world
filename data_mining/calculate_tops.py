@@ -174,7 +174,7 @@ def filter_out_of_margin(tops: List[XYZ]) -> List[XYZ]:
     return tops
 
 
-CHUNK_SIZE = 1000000 # 1000x1000x1000 km cube
+CHUNK_SIZE = 200000 # 200x200x200 km cube
 def save_results_to_local_file(tops: List[XYZ], output_file: str):
     tops_dto = convert_tops_to_dto(tops, CHUNK_SIZE)
     with open(output_file, 'w') as file:
