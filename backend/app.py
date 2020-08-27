@@ -21,6 +21,7 @@ PASSWORD = os.environ['DATABASE_PASSWORD']
 DATABASE_NAME = os.environ['DATABASE_NAME']
 COLLECTION_NAME = os.environ['COLLECTION_NAME']
 AUTH_TOKEN = os.environ['AUTH_TOKEN']
+CHUNK_SIZE = os.environ['CHUNK_SIZE']
 
 AUTH_TOKEN_HEADER_KEY = 'token'
 
@@ -56,7 +57,7 @@ def closest_top(latitude: float, longitude: float):
     try:
         with pymongo.MongoClient(CONNECTION_FORMAT.format(USERNAME, PASSWORD)) as client:
             collection = client[DATABASE_NAME][COLLECTION_NAME]
-            top_latitude, top_longitude = find_closest_top(latitude, longitude, collection)
+            top_latitude, top_longitude = find_closest_top(latitude, longitude, collection, CHUNK_SIZE)
     except Exception as e:
         app.logger.error('failed to find the closest top: {}'.format(str(e)))
         return jsonify(error='failed to find the closest top'), 500
