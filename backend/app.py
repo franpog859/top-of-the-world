@@ -58,6 +58,9 @@ def closest_top(latitude: float, longitude: float):
         with pymongo.MongoClient(CONNECTION_FORMAT.format(USERNAME, PASSWORD)) as client:
             collection = client[DATABASE_NAME][COLLECTION_NAME]
             top_latitude, top_longitude = find_closest_top(latitude, longitude, collection, CHUNK_SIZE)
+    except RuntimeError as e:
+        app.logger.error('failed to find the closest top: {}'.format(str(e)))
+        return jsonify(error='failed to find the closest top: {}'.format(str(e))), 400
     except Exception as e:
         app.logger.error('failed to find the closest top: {}'.format(str(e)))
         return jsonify(error='failed to find the closest top'), 500
