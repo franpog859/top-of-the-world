@@ -31,7 +31,7 @@ def calculate_closest_top_iteratively(xyz: np.ndarray, collection: pymongo.colle
         tops = [top for index in indexes for top in get_tops_for_index(index, collection)]
         this_iteration_closest_top = calculate_closest_top(xyz, tops)
         closest_top = swap_closest_top(this_iteration_closest_top, closest_top, xyz)
-        if closest_top is not None and calculate_distance(xyz, closest_top) < calculate_shortest_distance_to_the_edge(xyz, level, chunk_size):
+        if should_return_closest_top(closest_top, xyz, level, chunk_size):
             return closest_top
     raise RuntimeError("no tops found near the location")
 
@@ -47,10 +47,11 @@ def calculate_indexes_for_level(base_index: np.ndarray, level: int, chunk_size: 
             for z in range(-level, level+1):
                 # Add only chunks on the periphery
                 if abs(x) == level or abs(y) == level or abs(z) == level:
-                    indexes = np.append(indexes, [[
-                        base_index[0] + x * np.int(chunk_size),
-                        base_index[1] + y * np.int(chunk_size),
-                        base_index[2] + z * np.int(chunk_size)]], axis=0)
+                    indexes = np.append(indexes,
+                                        [[base_index[0] + x * np.int(chunk_size),
+                                          base_index[1] + y * np.int(chunk_size),
+                                          base_index[2] + z * np.int(chunk_size)]],
+                                        axis=0)
     return indexes
 
 
@@ -69,6 +70,10 @@ def calculate_distance(a: np.ndarray, b: np.ndarray) -> np.float:
 
 def swap_closest_top(new_top: np.ndarray, previous_top: np.ndarray, xyz: np.ndarray) -> np.ndarray:
     return calculate_closest_top(xyz, list(filter(lambda top: top is not None, [new_top, previous_top])))
+
+
+def should_return_closest_top(top: np.ndarray, xyz: np.ndarray, level: int, chunk_size: int) -> bool:
+    return top is not None and calculate_distance(xyz, top) < calculate_shortest_distance_to_the_edge(xyz, level, chunk_size)
 
 
 def calculate_shortest_distance_to_the_edge(xyz: np.ndarray, level:int, chunk_size: int) -> np.float:

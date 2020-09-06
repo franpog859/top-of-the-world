@@ -33,7 +33,7 @@ def test_calculate_indexes_for_level():
     ]
     for base_index, level, chunk_size in test_data_list:
         print(base_index, level, chunk_size)
-        # when 
+        # when
         indexes = calculate_indexes_for_level(base_index, level, chunk_size)
         # then
         assert len(indexes) == (level * 2 + 1)**3 - ((level - 1) * 2 + 1)**3 if level > 0 else 1
@@ -41,7 +41,8 @@ def test_calculate_indexes_for_level():
         if level > 0:
             level_lower_indexes = calculate_indexes_for_level(base_index, level - 1, chunk_size)
             for index in indexes:
-                assert (index == level_lower_indexes).all(1).any() == False
+                # See https://stackoverflow.com/questions/33217660/checking-if-a-numpy-array-contains-another-array
+                assert (index == level_lower_indexes).all(axis=1).any() == False
 
 
 def test_calculate_closest_top():
@@ -86,6 +87,21 @@ def test_swap_closest_top():
         closest_top = swap_closest_top(new_top, previous_top, xyz)
         # then
         np.testing.assert_array_equal(closest_top, expected_closest_top)
+
+def test_should_return_closest_top():
+    # given
+    test_data_list = [
+        (np.array([21, 20, 20]), np.array([20, 20, 20]), 0, 100, True),
+        (None, np.array([20, 20, 20]), 0, 100, False),
+        (np.array([20, 20, 20]), np.array([5, 5, 5]), 0, 100, False),
+        (np.array([20, 20, 20]), np.array([5, 5, 5]), 1, 100, True),
+    ]
+    for closest_top, xyz, level, chunk_size, expected_should_return in test_data_list:
+        print(closest_top, xyz, level, chunk_size, expected_should_return)
+        # when
+        should_return = should_return_closest_top(closest_top, xyz, level, chunk_size)
+        # then
+        assert should_return == expected_should_return
 
 
 def test_calculate_shortest_distance_to_the_edge():
