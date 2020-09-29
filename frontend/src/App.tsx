@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Button from 'react-bootstrap/Button'
 import './App.css'
+import Footer from './Footer/Footer'
+import Lead from './Lead/Lead'
 
 interface simplePosition {
   latitude: number
@@ -69,20 +71,35 @@ function App() {
   return (
     <div className='App'>
       <header className='App-header'>
-        <Button
-          variant='success'
-          onClick={openMap}
-          size='lg'
-          disabled={!shouldMapButtonBeEnabled()}>
-            Take me to the top!
-        </Button>
-        <br></br>
-        <Button
-          variant='outline-secondary'
-          onClick={openAbout}
-          size='lg'>
-            Wait, what?
-        </Button>
+        <Lead />
+        <div style={{
+          display: 'inline-flex',
+          borderRadius: 25,
+          overflow: 'hidden',
+        }}>
+          <Button
+            onClick={openMap}
+            variant='link'
+            style={{
+              background: '#c7b198',
+              color: '#596e79',
+            }}
+            size='lg'
+            disabled={!shouldMapButtonBeEnabled()}>
+              Take me to the TOP!
+          </Button>{' '}
+          <Button
+            variant='link'
+            onClick={openAbout}
+            style={{
+              background: '#c7b198',
+              color: '#596e79',
+            }}
+            size='lg'>
+              Wait, what?
+          </Button>
+        </div>
+        <Footer />
       </header>
     </div>
   );
