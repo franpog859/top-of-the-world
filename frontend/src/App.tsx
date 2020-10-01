@@ -85,8 +85,8 @@ function App() {
       topPosition !== undefined &&
       isMapButtonClicked === true
     ) {
-      setIsMapButtonClicked(false);
       openMap();
+      setIsMapButtonClicked(false);
     }
   }, [currentPosition, topPosition, isMapButtonClicked]);
 
