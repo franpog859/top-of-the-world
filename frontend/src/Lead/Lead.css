@@ -1,7 +1,7 @@
 .Lead {
   text-align: center;
   min-height: 60vh;
-  max-width: 80vw;
+  max-width: min(80vw, 40em);
   display: flex;
   align-items: center;
   justify-content: center;
