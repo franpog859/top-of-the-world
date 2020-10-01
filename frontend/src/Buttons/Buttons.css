@@ -1,19 +1,20 @@
-.Footer {
+.Buttons {
     text-align: center;
     min-height: 20vh;
+    max-width: 80vw;
 }
   
-.Footer-header {
+.Buttons-header {
     display: flex;
     flex-direction: column;
     align-self: flex-end;
     align-items: center;
     justify-content: center;
     color: #596e79;
+    margin: 25px;
 }
-  
-.Footer-icon {
-    width: 2em;
-    height: 2em;
-    color: #c7b198;
+
+.Buttons-ripple {
+    color: #596e79;
+    border-radius: 25px;
 }

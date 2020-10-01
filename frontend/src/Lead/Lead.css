@@ -1,14 +1,40 @@
 .Lead {
     text-align: center;
-    min-height: 20vh;
-    max-width: 80vw;
-}
-
-.Footer-header {
+    min-height: 60vh;
+    width: 80vw;
     display: flex;
-    flex-direction: column;
-    align-self: flex-end;
     align-items: center;
     justify-content: center;
+}
+
+.Lead-animation {
+    animation-timing-function: ease-out;
+    animation: fade-in 700ms;
+    transition: all 700ms ease-in-out;
+}
+
+.Lead-div {
+    padding: 10vw;
+    padding-top: 14vw;
+    border-radius: 25px;
+    background-color: #f0ece3;
     color: #596e79;
+}
+
+.Lead-icon {
+    width: 1.2em;
+    height: 1.2em;
+    margin-top: -0.2em;
+    color: #596e79;
+}
+
+@keyframes fade-in {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }

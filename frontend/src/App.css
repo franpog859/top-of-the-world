@@ -1,18 +1,34 @@
 .App {
   text-align: center;
+  background-color: #dfd3c3;
 }
 
 .App-header {
-  background-color: #f0ece3;
   min-height: 100vh;
   max-width: 100vw;
   display: flex;
-  font-weight: bold;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: #596e79;
+}
+
+.App-animation {
+  animation-timing-function: ease-out;
+  animation: fade-in 700ms;
+  transition: all 700ms ease-in-out;
+}
+
+@keyframes fade-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* colors:

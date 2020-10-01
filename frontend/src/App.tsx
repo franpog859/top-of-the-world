@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import Button from 'react-bootstrap/Button'
 import './App.css'
-import Footer from './Footer/Footer'
 import Lead from './Lead/Lead'
+import Buttons from './Buttons/Buttons'
+import Footer from './Footer/Footer'
 
 interface simplePosition {
   latitude: number
@@ -12,6 +12,8 @@ interface simplePosition {
 function App() {
   const [currentPosition, setCurrentPosition] = useState<Position | undefined>(undefined)
   const [topPosition, setTopPosition] = useState<simplePosition | undefined>(undefined)
+  const [isMapButtonClicked, setIsMapButtonClicked] = useState<boolean>(false)
+  const [didFetchingFail, setDidFetchingFail] = useState<boolean>(false)
   const backendURL = process.env.REACT_APP_BACKEND_URL!
   const authToken = process.env.REACT_APP_AUTH_TOKEN!
 
@@ -46,7 +48,11 @@ function App() {
         latitude: response.latitude,
         longitude: response.longitude
       }))
-      .catch(error => console.error('Failed to get closest top: ', error))
+      .catch(error => {
+        console.error('Failed to get closest top: ', error)
+        setDidFetchingFail(true)
+        setIsMapButtonClicked(false)
+      })
   }
   useEffect(() => {
     if (currentPosition) fetchClosestTopPosition()
@@ -60,49 +66,37 @@ function App() {
     window.open(`https://www.google.be/maps/dir/${currentLatitude},${currentLongitude}`+
       `/${topLatitude},${topLongitude}/data=!3m1!4b1!4m2!4m1!3e2`)
   }
+  useEffect(() => {
+    if (currentPosition !== undefined &&
+        topPosition !== undefined &&
+        isMapButtonClicked === true) {
+
+          setIsMapButtonClicked(false)
+          openMap()
+        }
+  }, [currentPosition, topPosition, isMapButtonClicked])
+
+  const clickMapButton = () => {
+    setIsMapButtonClicked(true)
+  }
   const openAbout = () => {
     window.open('https://github.com/franpog859/top-of-the-world/blob/master/README.md')
   }
 
-  const shouldMapButtonBeEnabled = (): boolean => {
-    return currentPosition !== undefined && topPosition !== undefined
-  }
-
   return (
     <div className='App'>
-      <header className='App-header'>
-        <Lead />
-        <div style={{
-          display: 'inline-flex',
-          borderRadius: 25,
-          overflow: 'hidden',
-        }}>
-          <Button
-            onClick={openMap}
-            variant='link'
-            style={{
-              background: '#c7b198',
-              color: '#596e79',
-            }}
-            size='lg'
-            disabled={!shouldMapButtonBeEnabled()}>
-              Take me to the TOP!
-          </Button>{' '}
-          <Button
-            variant='link'
-            onClick={openAbout}
-            style={{
-              background: '#c7b198',
-              color: '#596e79',
-            }}
-            size='lg'>
-              Wait, what?
-          </Button>
-        </div>
+      <header className='App-header App-animation'>
+        <Lead 
+          didFetchingFail={didFetchingFail}
+          isLocationAvailable={currentPosition !== undefined}/>
+        <Buttons
+          clickMapButton={clickMapButton}
+          clickAboutButton={openAbout}
+          isMapButtonClicked={isMapButtonClicked}/>
         <Footer />
       </header>
     </div>
-  );
+  )
 }
 
 export default App
