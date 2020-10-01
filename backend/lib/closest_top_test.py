@@ -88,6 +88,7 @@ def test_swap_closest_top():
         # then
         np.testing.assert_array_equal(closest_top, expected_closest_top)
 
+
 def test_should_return_closest_top():
     # given
     test_data_list = [

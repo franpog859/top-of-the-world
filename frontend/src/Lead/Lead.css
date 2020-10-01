@@ -1,22 +1,32 @@
-.App {
+.Lead {
   text-align: center;
-  background-color: #dfd3c3;
-}
-
-.App-header {
-  min-height: 100vh;
-  max-width: 100vw;
+  min-height: 60vh;
+  max-width: min(80vw, 40em);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #596e79;
 }
 
-.App-animation {
+.Lead-animation {
   animation-timing-function: ease-out;
   animation: fade-in 700ms;
   transition: all 700ms ease-in-out;
+}
+
+.Lead-div {
+  padding: 5vh;
+  max-height: 30vh + 5vh;
+  border-radius: 25px;
+  font-size: calc(10px + 2vmin);
+  background-color: #f0ece3;
+  color: #596e79;
+}
+
+.Lead-icon {
+  width: 1.2em;
+  height: 1.2em;
+  margin-top: -0.2em;
+  color: #596e79;
 }
 
 @keyframes fade-in {
@@ -29,10 +39,3 @@
     opacity: 1;
   }
 }
-
-/* colors:
-f0ece3
-dfd3c3
-c7b198
-596e79 
-*/
