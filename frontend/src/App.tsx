@@ -17,6 +17,7 @@ function App() {
     undefined
   );
   const [isMapButtonClicked, setIsMapButtonClicked] = useState<boolean>(false);
+  const [isEncourageMessage, setIsEncourageMessage] = useState<boolean>(false);
   const [didFetchingFail, setDidFetchingFail] = useState<boolean>(false);
   const backendURL = process.env.REACT_APP_BACKEND_URL!;
   const authToken = process.env.REACT_APP_AUTH_TOKEN!;
@@ -53,12 +54,15 @@ function App() {
         console.debug(response);
         return response;
       })
-      .then(response =>
+      .then(response => {
         setTopPosition({
           latitude: response.latitude,
           longitude: response.longitude
-        })
-      )
+        });
+        if (isMapButtonClicked === false) {
+          setIsEncourageMessage(true);
+        }
+      })
       .catch(error => {
         console.error("Failed to get closest top: ", error);
         setDidFetchingFail(true);
@@ -87,6 +91,7 @@ function App() {
     ) {
       openMap();
       setIsMapButtonClicked(false);
+      setIsEncourageMessage(false);
     }
   }, [currentPosition, topPosition, isMapButtonClicked]);
 
@@ -105,6 +110,7 @@ function App() {
         <Lead
           didFetchingFail={didFetchingFail}
           isLocationAvailable={currentPosition !== undefined}
+          isEncourageMessage={isEncourageMessage}
         />
         <Buttons
           clickMapButton={clickMapButton}
