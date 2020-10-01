@@ -1,7 +1,7 @@
 .Lead {
   text-align: center;
   min-height: 60vh;
-  width: 80vw;
+  max-width: 80vw;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,8 +14,8 @@
 }
 
 .Lead-div {
-  padding: 10vw;
-  padding-top: 14vw;
+  padding: 5vh;
+  max-height: 30vh + 5vh;
   border-radius: 25px;
   background-color: #f0ece3;
   color: #596e79;
