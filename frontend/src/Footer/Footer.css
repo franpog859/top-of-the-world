@@ -1,19 +1,19 @@
 .Footer {
-    text-align: center;
-    min-height: 20vh;
+  text-align: center;
+  min-height: 20vh;
 }
-  
+
 .Footer-header {
-    display: flex;
-    flex-direction: column;
-    align-self: flex-end;
-    align-items: center;
-    justify-content: center;
-    color: #596e79;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  align-items: center;
+  justify-content: center;
+  color: #596e79;
 }
-  
+
 .Footer-icon {
-    width: 2em;
-    height: 2em;
-    color: #c7b198;
+  width: 2em;
+  height: 2em;
+  color: #c7b198;
 }
